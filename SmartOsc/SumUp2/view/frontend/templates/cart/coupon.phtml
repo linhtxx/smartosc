@@ -1,0 +1,74 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\Framework\View\Element\AbstractBlock $block
+ */
+
+// We should use strlen function because coupon code could be "0", converted to bool will lead to false
+$hasCouponCode = (bool)count($block->getCouponArray());
+$couponArray = $block->getCouponArray();
+?>
+<div class="block discount"
+     id="block-discount"
+     data-mage-init='{"collapsible":{"openedState": "active", "saveState": false}}'
+>
+    <div class="title" data-role="title">
+        <strong id="block-discount-heading" role="heading"
+                aria-level="2"><?= $block->escapeHtml(__('Apply Discount Code')) ?></strong>
+    </div>
+    <div class="content" data-role="content" aria-labelledby="block-discount-heading">
+        <form id="discount-coupon-form"
+              action="<?= $block->escapeUrl($block->getUrl('checkout/cart/couponPost')) ?>"
+              method="post"
+              data-mage-init='{"discountCode":{"couponCodeSelector": "#coupon_code",
+                                               "removeCouponSelector": "#remove-coupon",
+                                               "couponNameSelector": "#couponName",
+                                               "removedCouponSelector": "#removed-coupon",
+                                               "applyButton": "button.action.apply",
+                                               "cancelButton": "button.action.cancel"}}'>
+            <div class="fieldset coupon<?= $hasCouponCode ? ' applied' : '' ?>">
+                <input type="hidden" name="remove" id="remove-coupon" value="0"/>
+                <div class="field">
+                    <label for="coupon_code"
+                           class="label"><span><?= $block->escapeHtml(__('Enter discount code')) ?></span></label>
+                    <div class="control">
+                        <input type="text"
+                               class="input-text"
+                               id="coupon_code"
+                               name="coupon_code"
+                               placeholder="<?= $block->escapeHtmlAttr(__('Enter discount code')) ?>"
+                        />
+                    </div>
+                </div>
+                <div class="actions-toolbar">
+                    <div class="primary">
+                        <button class="action apply primary" type="button"
+                                value="<?= $block->escapeHtmlAttr(__('Apply Discount')) ?>">
+                            <span><?= $block->escapeHtml(__('Apply Discount')) ?></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <?php if ($hasCouponCode): ?>
+                <input type="hidden" id="removed-coupon" value="" name="removed_coupon">
+                <?php foreach ($couponArray as $coupon): ?>
+                    <div class="field">
+                        <div class="actions-toolbar">
+                            <div class="primary" style="margin-right: 5px">
+                                <button type="button" class="action cancel primary" id="<?= $coupon ?>"
+                                        value="<?= $block->escapeHtmlAttr(__('Cancel Coupon')) ?>">
+                                    <span><b>x</b><?= $block->escapeHtml(__("  $coupon")) ?></span></button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </form>
+    </div>
+</div>
+
+
